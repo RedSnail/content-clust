@@ -1,0 +1,15 @@
+Package: content.clust
+Title: scRNAseq data analysis
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Oleg",
+           family = "Demianchenko",
+           role = c("aut", "cre"),
+           email = "oleg.demianchenko@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: A package for clustering cells in scRNAseq data based on intergenic relationships.
+License: GPL (>= 2)
+Encoding: UTF-8
+LinkingTo: Rcpp
+Imports: Rcpp (>= 1.0.2)
+RoxygenNote: 6.1.99.9000
