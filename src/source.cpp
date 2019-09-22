@@ -1,76 +1,24 @@
+/*
+Copyright (C) 2019  Oleg Demiancheko
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>
+*/
+
 #include <Rcpp.h>
-#include <RcppEigen.h>
 
 using namespace Rcpp;
-// [[Rcpp::depends(RcppEigen)]]
 
-
-//
-
-// [[Rcpp::export]]
-NumericVector SparseRowVar2(Eigen::SparseMatrix<double> mat,
-                            NumericVector mu, 
-                            int power){
-  mat = mat.transpose();
-  NumericVector allVars = no_init(mat.cols());
-  for (int k=0; k<mat.outerSize(); ++k){
-    double colSum = 0;
-    int nZero = mat.rows();
-    for (Eigen::SparseMatrix<double>::InnerIterator it(mat,k); it; ++it) {
-      nZero -= 1;
-      colSum += pow(it.value() - mu[k], power);
-    }
-    colSum += pow(mu[k], power) * nZero;
-    allVars[k] = colSum / (mat.rows() - 1);
-  }
-  return(allVars);
-}
-
-
-// [[Rcpp::export]]
-NumericVector SparseRowVarStd(Eigen::SparseMatrix<double> mat,
-                              NumericVector mu,
-                              NumericVector sd,
-                              double vmax){
-  mat = mat.transpose();
-  NumericVector allVars(mat.cols());
-  for (int k=0; k<mat.outerSize(); ++k){
-    if (sd[k] == 0) continue;
-    double colSum = 0;
-    int nZero = mat.rows();
-    for (Eigen::SparseMatrix<double>::InnerIterator it(mat,k); it; ++it)
-    {
-      nZero -= 1;
-      colSum += pow(std::min(vmax, (it.value() - mu[k]) / sd[k]), 2);
-    }
-    colSum += pow((0 - mu[k]) / sd[k], 2) * nZero;
-    allVars[k] = colSum / (mat.rows() - 1);
-  }
-  return(allVars);
-}
-
-// [[Rcpp::export]]
-NumericVector SparseRowVarStd2(Eigen::SparseMatrix<double> mat,
-                               NumericVector mu,
-                               NumericVector var,
-                               double varmax, 
-                               int power){
-  mat = mat.transpose();
-  NumericVector allVars(mat.cols());
-  for (int k=0; k<mat.outerSize(); ++k){
-    if (var[k] == 0) continue;
-    double colSum = 0;
-    int nZero = mat.rows();
-    for (Eigen::SparseMatrix<double>::InnerIterator it(mat,k); it; ++it)
-    {
-      nZero -= 1;
-      colSum += std::min(varmax*var[k], pow(it.value() - mu[k], power));
-    }
-    colSum += pow(mu[k], power) * nZero;
-    allVars[k] = colSum/((mat.rows() - 1)*var[k]);
-  }
-  return(allVars);
-}
 
 // [[Rcpp::export]]
 NumericVector Expression(NumericVector p) {
@@ -131,14 +79,14 @@ bool HasOverlap(IntegerVector i,
 
 
 // [[Rcpp::export]]
-IntegerVector SubstractSorted(IntegerVector a, IntegerVector b) {
-  int* result = (int*) malloc(a.length()*sizeof(int));
+IntegerVector SubstractSorted(IntegerVector a, IntegerVector p, int b_start, int b_end) {
+  int* result = (int*) malloc((a.length())*sizeof(int));
   int result_index = 0;
   int j = 0;
-  for (int i = 0; i < b.length(); i++) {
-    while(a[j] <= b[i]) {
-      if(a[j] != b[i]) {
-        result[result_index] = a[j];
+  for (int i = b_start; i < b_end; i++) {
+    while(p[j] <= p[i]) {
+      if(p[j] != p[i]) {
+        result[result_index] = p[j];
         result_index++;
       }
       j++;
@@ -146,7 +94,7 @@ IntegerVector SubstractSorted(IntegerVector a, IntegerVector b) {
   }
   
   while(j < a.length()) {
-    result[result_index] = a[j];
+    result[result_index] = p[j];
     j++;
     result_index++;
   }
@@ -212,9 +160,9 @@ Rcpp::List ProcessOrientedGraph(IntegerVector i, IntegerVector p, int cells,
         }
         
       }
-      unclussified = SubstractSorted(unclussified, 
-                                     i[Range(p[geneOrder[(int) child_vertices[index]]],
-                                             p[geneOrder[(int) child_vertices[index]] + 1] - 1)]);
+      unclussified = SubstractSorted(unclussified, i, 
+                                     p[geneOrder[(int) child_vertices[index]]], 
+                                     p[geneOrder[(int) child_vertices[index]] + 1]);
     }
   }
   
@@ -228,9 +176,10 @@ Rcpp::List ProcessOrientedGraph(IntegerVector i, IntegerVector p, int cells,
   return outlist;
 }
 
+//' @export
 // [[Rcpp::export]]
-Rcpp::List ContentClust(IntegerVector i, IntegerVector p, int cells,
-                        CharacterVector geneNames, IntegerVector geneOrder) {
+Rcpp::List content_clust(IntegerVector i, IntegerVector p, int cells,
+                         CharacterVector geneNames, IntegerVector geneOrder) {
   IntegerVector content (geneOrder.length(), -1);
   for (int bigger_gene = 0; bigger_gene < geneOrder.length(); bigger_gene++) {
     for(int smaller_gene = bigger_gene+1; smaller_gene < geneOrder.length(); smaller_gene++) {
@@ -243,6 +192,12 @@ Rcpp::List ContentClust(IntegerVector i, IntegerVector p, int cells,
   }
   
   return ProcessOrientedGraph(i, p, cells, geneNames, geneOrder, content, -1);
+}
+
+//' @export
+// [[Rcpp::export]]
+void c_hello_world() {
+	printf("hello world, it's c, are you ok?");
 }
 
 
