@@ -17,6 +17,14 @@ substract_sorted <- function(a, i, b_start, b_end) {
     .Call('_content_clust_substract_sorted', PACKAGE = 'content.clust', a, i, b_start, b_end)
 }
 
+find_children <- function(content, parent) {
+    .Call('_content_clust_find_children', PACKAGE = 'content.clust', content, parent)
+}
+
+get_cell_set <- function(i, p, cells, geneOrder, start) {
+    .Call('_content_clust_get_cell_set', PACKAGE = 'content.clust', i, p, cells, geneOrder, start)
+}
+
 #' @export
 content_clust <- function(i, p, cells, geneNames, geneOrder) {
     .Call('_content_clust_content_clust', PACKAGE = 'content.clust', i, p, cells, geneNames, geneOrder)

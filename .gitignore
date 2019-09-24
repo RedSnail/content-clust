@@ -5,3 +5,4 @@
 ./content_clust.Rproj
 *.o
 *.so
+*.swp

@@ -60,6 +60,33 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// find_children
+IntegerVector find_children(IntegerVector content, int parent);
+RcppExport SEXP _content_clust_find_children(SEXP contentSEXP, SEXP parentSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type content(contentSEXP);
+    Rcpp::traits::input_parameter< int >::type parent(parentSEXP);
+    rcpp_result_gen = Rcpp::wrap(find_children(content, parent));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_cell_set
+IntegerVector get_cell_set(IntegerVector i, IntegerVector p, int cells, IntegerVector geneOrder, int start);
+RcppExport SEXP _content_clust_get_cell_set(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneOrderSEXP, SEXP startSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type cells(cellsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type geneOrder(geneOrderSEXP);
+    Rcpp::traits::input_parameter< int >::type start(startSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_cell_set(i, p, cells, geneOrder, start));
+    return rcpp_result_gen;
+END_RCPP
+}
 // content_clust
 Rcpp::List content_clust(IntegerVector i, IntegerVector p, int cells, CharacterVector geneNames, IntegerVector geneOrder);
 RcppExport SEXP _content_clust_content_clust(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneNamesSEXP, SEXP geneOrderSEXP) {
@@ -90,6 +117,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_content_clust_small_in_big", (DL_FUNC) &_content_clust_small_in_big, 5},
     {"_content_clust_have_overlap", (DL_FUNC) &_content_clust_have_overlap, 5},
     {"_content_clust_substract_sorted", (DL_FUNC) &_content_clust_substract_sorted, 4},
+    {"_content_clust_find_children", (DL_FUNC) &_content_clust_find_children, 2},
+    {"_content_clust_get_cell_set", (DL_FUNC) &_content_clust_get_cell_set, 5},
     {"_content_clust_content_clust", (DL_FUNC) &_content_clust_content_clust, 5},
     {"_content_clust_c_hello_world", (DL_FUNC) &_content_clust_c_hello_world, 0},
     {NULL, NULL, 0}

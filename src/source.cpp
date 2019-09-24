@@ -102,26 +102,40 @@ IntegerVector substract_sorted(IntegerVector a, IntegerVector i, int b_start, in
   return IntegerVector(result, &(result[result_index]));
 }
 
+// [[Rcpp::export]]
+IntegerVector find_children(IntegerVector content, int parent) {
+	IntegerVector ret;
+	for (int index = parent+1; index < content.length(); index++) {
+		if (parent == content[index]) {
+			ret.push_back(index);
+		}
+	}
+
+	return ret;
+}
+
+// [[Rcpp::export]]
+IntegerVector get_cell_set(IntegerVector i, IntegerVector p, int cells, IntegerVector geneOrder, int start) {
+	IntegerVector ret = NULL;
+
+	if (start != -1) {
+		ret = i[Range(p[geneOrder[start]], p[geneOrder[start] + 1] - 1)];
+	} else {
+		ret = Range(0, cells - 1);
+	}
+
+	return ret;
+}
+
 Rcpp::List ProcessOrientedGraph(IntegerVector i, IntegerVector p, int cells, 
                                 CharacterVector geneNames, IntegerVector geneOrder,
                                 IntegerVector content, int start) {
   printf("starting to process suborgraph\n");
   Rcpp::List outlist;
   Rcpp::StringVector list_names;
-  IntegerVector child_vertices;
-  for (int ind = start; ind < content.length(); ind++) {
-    if (start == content[ind]) {
-      child_vertices.push_back(ind);
-    }
-  }
+  IntegerVector child_vertices = find_children(content, start);
   
-  IntegerVector unclussified = NULL;
-  
-  if (start != -1) {
-    unclussified = i[Range(p[geneOrder[start]], p[geneOrder[start] + 1] - 1)];
-  } else {
-    unclussified = Range(0, cells - 1);
-  }
+  IntegerVector unclussified = get_cell_set(i, p, cells, geneOrder, start);
   
   printf("the num of cells of is %d\n", p[geneOrder[start] + 1] - p[geneOrder[start]] + 1);
   
