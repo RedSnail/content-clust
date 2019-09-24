@@ -21,7 +21,7 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-NumericVector Expression(NumericVector p) {
+NumericVector expression(NumericVector p) {
   NumericVector expression = no_init(p.length() - 1);
   for(int index = 0; index < (p.length() - 1); index++) {
     expression[index] = p[index + 1] - p[index];
@@ -31,13 +31,13 @@ NumericVector Expression(NumericVector p) {
 }
 
 // [[Rcpp::export]]
-bool OneInAnother(IntegerVector i, 
-                  int start1, int end1, 
-                  int start2, int end2) {
+bool small_in_big(IntegerVector i, 
+                  int small_start, int small_end, 
+                  int big_start, int big_end) {
   bool ret = true;
-  int big = start2;
-  int small = start1;
-  while (small < end1) {
+  int big = big_start;
+  int small = small_start;
+  while (small < small_end) {
     if(i[small] == i[big]) {
       small++;
       big++;
@@ -46,7 +46,7 @@ bool OneInAnother(IntegerVector i,
       big++;
     }
     
-    if ((i[big] > i[small]) or (big >= end2)) {
+    if ((i[big] > i[small]) or (big >= big_end)) {
       ret=false;
       break;
     }
@@ -57,9 +57,9 @@ bool OneInAnother(IntegerVector i,
 
 
 // [[Rcpp::export]]
-bool HasOverlap(IntegerVector i, 
-                int start1, int end1, 
-                int start2, int end2) {
+bool have_overlap(IntegerVector i, 
+                  int start1, int end1, 
+                  int start2, int end2) {
   bool ret = false;
   while(start1 < end1 and start2 < end2) {
     if(i[start1] == i[start2]) {
@@ -79,23 +79,23 @@ bool HasOverlap(IntegerVector i,
 
 
 // [[Rcpp::export]]
-IntegerVector SubstractSorted(IntegerVector a, IntegerVector p, int b_start, int b_end) {
+IntegerVector substract_sorted(IntegerVector a, IntegerVector i, int b_start, int b_end) {
   int* result = (int*) malloc((a.length())*sizeof(int));
   int result_index = 0;
-  int j = 0;
-  for (int i = b_start; i < b_end; i++) {
-    while(p[j] <= p[i]) {
-      if(p[j] != p[i]) {
-        result[result_index] = p[j];
+  int a_index = 0;
+  for (int i_index = b_start; i_index < b_end; i_index++) {
+    while(a[a_index] <= i[i_index]) {
+      if(a[a_index] != i[i_index]) {
+        result[result_index] = a[a_index];
         result_index++;
       }
-      j++;
+      a_index++;
     }
   }
   
-  while(j < a.length()) {
-    result[result_index] = p[j];
-    j++;
+  while(a_index < a.length()) {
+    result[result_index] = a[a_index];
+    a_index++;
     result_index++;
   }
   
@@ -133,10 +133,10 @@ Rcpp::List ProcessOrientedGraph(IntegerVector i, IntegerVector p, int cells,
         continue;
       }
       
-      if (HasOverlap(i, 
-                     p[geneOrder[(int) child_vertices[index]]],
-                     p[geneOrder[(int) child_vertices[index]] + 1], 
-                     p[geneOrder[(int) child_vertices[j]]],
+      if (have_overlap(i, 
+                       p[geneOrder[(int) child_vertices[index]]],
+                       p[geneOrder[(int) child_vertices[index]] + 1], 
+                       p[geneOrder[(int) child_vertices[j]]],
                      p[geneOrder[(int) child_vertices[j]] + 1])) {
         separate = false;
         break;
@@ -160,9 +160,9 @@ Rcpp::List ProcessOrientedGraph(IntegerVector i, IntegerVector p, int cells,
         }
         
       }
-      unclussified = SubstractSorted(unclussified, i, 
-                                     p[geneOrder[(int) child_vertices[index]]], 
-                                     p[geneOrder[(int) child_vertices[index]] + 1]);
+      unclussified = substract_sorted(unclussified, i, 
+                                      p[geneOrder[(int) child_vertices[index]]], 
+                                      p[geneOrder[(int) child_vertices[index]] + 1]);
     }
   }
   
@@ -183,7 +183,7 @@ Rcpp::List content_clust(IntegerVector i, IntegerVector p, int cells,
   IntegerVector content (geneOrder.length(), -1);
   for (int bigger_gene = 0; bigger_gene < geneOrder.length(); bigger_gene++) {
     for(int smaller_gene = bigger_gene+1; smaller_gene < geneOrder.length(); smaller_gene++) {
-      if (OneInAnother(i, p[geneOrder[smaller_gene]], p[geneOrder[smaller_gene] + 1],
+      if (small_in_big(i, p[geneOrder[smaller_gene]], p[geneOrder[smaller_gene] + 1],
                        p[geneOrder[bigger_gene]], p[geneOrder[bigger_gene] + 1])) {
         printf("one in another\n");
         content[smaller_gene] = bigger_gene;
