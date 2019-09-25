@@ -87,6 +87,37 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_sep_genes
+IntegerVector get_sep_genes(IntegerVector i, IntegerVector p, IntegerVector geneOrder, IntegerVector child_genes);
+RcppExport SEXP _content_clust_get_sep_genes(SEXP iSEXP, SEXP pSEXP, SEXP geneOrderSEXP, SEXP child_genesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type geneOrder(geneOrderSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type child_genes(child_genesSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_sep_genes(i, p, geneOrder, child_genes));
+    return rcpp_result_gen;
+END_RCPP
+}
+// process_oriented_graph
+Rcpp::List process_oriented_graph(IntegerVector i, IntegerVector p, int cells, CharacterVector geneNames, IntegerVector geneOrder, IntegerVector content, int start);
+RcppExport SEXP _content_clust_process_oriented_graph(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneNamesSEXP, SEXP geneOrderSEXP, SEXP contentSEXP, SEXP startSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type cells(cellsSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type geneNames(geneNamesSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type geneOrder(geneOrderSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type content(contentSEXP);
+    Rcpp::traits::input_parameter< int >::type start(startSEXP);
+    rcpp_result_gen = Rcpp::wrap(process_oriented_graph(i, p, cells, geneNames, geneOrder, content, start));
+    return rcpp_result_gen;
+END_RCPP
+}
 // content_clust
 Rcpp::List content_clust(IntegerVector i, IntegerVector p, int cells, CharacterVector geneNames, IntegerVector geneOrder);
 RcppExport SEXP _content_clust_content_clust(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneNamesSEXP, SEXP geneOrderSEXP) {
@@ -119,6 +150,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_content_clust_substract_sorted", (DL_FUNC) &_content_clust_substract_sorted, 4},
     {"_content_clust_find_children", (DL_FUNC) &_content_clust_find_children, 2},
     {"_content_clust_get_cell_set", (DL_FUNC) &_content_clust_get_cell_set, 5},
+    {"_content_clust_get_sep_genes", (DL_FUNC) &_content_clust_get_sep_genes, 4},
+    {"_content_clust_process_oriented_graph", (DL_FUNC) &_content_clust_process_oriented_graph, 7},
     {"_content_clust_content_clust", (DL_FUNC) &_content_clust_content_clust, 5},
     {"_content_clust_c_hello_world", (DL_FUNC) &_content_clust_c_hello_world, 0},
     {NULL, NULL, 0}

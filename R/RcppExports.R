@@ -25,6 +25,14 @@ get_cell_set <- function(i, p, cells, geneOrder, start) {
     .Call('_content_clust_get_cell_set', PACKAGE = 'content.clust', i, p, cells, geneOrder, start)
 }
 
+get_sep_genes <- function(i, p, geneOrder, child_genes) {
+    .Call('_content_clust_get_sep_genes', PACKAGE = 'content.clust', i, p, geneOrder, child_genes)
+}
+
+process_oriented_graph <- function(i, p, cells, geneNames, geneOrder, content, start) {
+    .Call('_content_clust_process_oriented_graph', PACKAGE = 'content.clust', i, p, cells, geneNames, geneOrder, content, start)
+}
+
 #' @export
 content_clust <- function(i, p, cells, geneNames, geneOrder) {
     .Call('_content_clust_content_clust', PACKAGE = 'content.clust', i, p, cells, geneNames, geneOrder)

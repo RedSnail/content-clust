@@ -127,67 +127,73 @@ IntegerVector get_cell_set(IntegerVector i, IntegerVector p, int cells, IntegerV
 	return ret;
 }
 
-Rcpp::List ProcessOrientedGraph(IntegerVector i, IntegerVector p, int cells, 
-                                CharacterVector geneNames, IntegerVector geneOrder,
-                                IntegerVector content, int start) {
-  printf("starting to process suborgraph\n");
-  Rcpp::List outlist;
-  Rcpp::StringVector list_names;
-  IntegerVector child_vertices = find_children(content, start);
+// [[Rcpp::export]]
+IntegerVector get_sep_genes(IntegerVector i, IntegerVector p, IntegerVector geneOrder, IntegerVector child_genes) {
+	IntegerVector ret;
+	for(int i_ind = 0; i_ind < child_genes.length(); i_ind++) {
+		bool sep = true;
+		for(int j_ind = 0; j_ind < child_genes.length(); j_ind++) {
+			if (i_ind == j_ind) {
+				continue;
+			}
+
+			if (have_overlap(i, 
+					 p[geneOrder[child_genes[i_ind]]], 
+					 p[geneOrder[child_genes[i_ind]] + 1], 
+					 p[geneOrder[child_genes[j_ind]]], 
+					 p[geneOrder[child_genes[j_ind]] + 1])) {
+				sep = false;
+				break;
+			}
+		}
+		if (sep) {
+			ret.push_back(child_genes[i_ind]);
+		}
+	}
+
+	return ret;
+}
+
+//[[Rcpp::export]]
+Rcpp::List process_oriented_graph(IntegerVector i, IntegerVector p, int cells, 
+                                  CharacterVector geneNames, IntegerVector geneOrder,
+                                  IntegerVector content, int start) {
+	printf("starting to process suborgraph\n");
+	IntegerVector child_vertices = find_children(content, start);
   
-  IntegerVector unclussified = get_cell_set(i, p, cells, geneOrder, start);
+	IntegerVector unclussified = get_cell_set(i, p, cells, geneOrder, start);
   
-  printf("the num of cells of is %d\n", p[geneOrder[start] + 1] - p[geneOrder[start]] + 1);
+	printf("the num of cells of is %d\n", p[geneOrder[start] + 1] - p[geneOrder[start]]);
+
+	IntegerVector sep_genes = get_sep_genes(i, p, geneOrder, child_vertices);
+	
+	Rcpp::List outlist;
+	Rcpp::StringVector list_names;
+
+	for (int sep_ind = 0; sep_ind < sep_genes.length(); sep_ind++) {
+		printf("captain, gene %d seems to be separate from brothers\n", geneOrder[sep_genes[sep_ind]]);
+		Rcpp::List child_sublist = process_oriented_graph(i, p, cells, geneNames, geneOrder, content, sep_genes[sep_ind]);
+		Rcpp::String gene_name = geneNames[geneOrder[sep_genes[sep_ind]]];
+		list_names.push_back(gene_name);
+		if (child_sublist.length() > 1) {
+			outlist.push_back(child_sublist);  
+		} else {
+			outlist.push_back(child_sublist[0]);
+		}
+
+		unclussified = substract_sorted(unclussified, i, 
+                                      		p[geneOrder[sep_genes[sep_ind]]], 
+                                      		p[geneOrder[sep_genes[sep_ind]] + 1]);
+	}
   
-  for(int index = 0; index < child_vertices.length(); index++) {
-    bool separate = true;
-    
-    for(int j = 0; j < child_vertices.length(); j++) {
-      if(index==j) {
-        continue;
-      }
-      
-      if (have_overlap(i, 
-                       p[geneOrder[(int) child_vertices[index]]],
-                       p[geneOrder[(int) child_vertices[index]] + 1], 
-                       p[geneOrder[(int) child_vertices[j]]],
-                     p[geneOrder[(int) child_vertices[j]] + 1])) {
-        separate = false;
-        break;
-      }
-    }
-    
-    if (separate) {
-      printf("captain, gene %d seems to be separate from brothers\n", geneOrder[(int) child_vertices[index]]);
-      Rcpp::List child_sublist = ProcessOrientedGraph(i, p, cells, geneNames, geneOrder, content, (int) child_vertices[index]);
-      Rcpp::String gene_name = geneNames[geneOrder[(int) child_vertices[index]]];
-      list_names.push_back(gene_name);
-      if (child_sublist.length() > 1) {
-        outlist.push_back(child_sublist);  
-      } else {
-        outlist.push_back(child_sublist[0]);
-      }
-      if(start == -1) {
-        printf("substracting\n");
-        for(int p_index = p[geneOrder[(int) child_vertices[index]]]; p_index < p[geneOrder[(int) child_vertices[index]] + 1]; p_index++) {
-          printf("    %d\n", i[p_index]);
-        }
-        
-      }
-      unclussified = substract_sorted(unclussified, i, 
-                                      p[geneOrder[(int) child_vertices[index]]], 
-                                      p[geneOrder[(int) child_vertices[index]] + 1]);
-    }
-  }
+	if (unclussified.length() > 0) {
+		outlist.push_back(unclussified);
+		list_names.push_back("unclussified");
+	}
   
-  if (unclussified.length() > 0) {
-    outlist.push_back(unclussified);
-    list_names.push_back("unclussified");
-  }
-  
-  printf("suborgraph processing ended\n");
-  outlist.names() = list_names;
-  return outlist;
+	printf("suborgraph processing ended\n");
+	outlist.names() = list_names;
+	return outlist;
 }
 
 //' @export
@@ -205,7 +211,7 @@ Rcpp::List content_clust(IntegerVector i, IntegerVector p, int cells,
     }
   }
   
-  return ProcessOrientedGraph(i, p, cells, geneNames, geneOrder, content, -1);
+  return process_oriented_graph(i, p, cells, geneNames, geneOrder, content, -1);
 }
 
 //' @export
