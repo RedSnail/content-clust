@@ -15,7 +15,8 @@ test_that("functions that work with sets like sorted vectors", {
 	expect_equal(have_overlap(test_i, 7, 9, 9, 11), TRUE)
 
 	# test substract_sorted()
-	expect_equal(substract_sorted(c(1, 4, 5), test_i, 12, 14), c(4, 5)) 
+	expect_equal(substract_sorted(c(1, 4, 5), test_i, 12, 14), c(4, 5))
+	expect_equal(substract_sorted(c(2, 3, 4, 5, 6), test_i, 5, 7), c(2, 3, 4)) 
 })
 
 test_that("count each gene expression", {
@@ -36,6 +37,7 @@ test_that("suborgraph processing preparations", {
 	# test cell set initiation
 	expect_equal(get_cell_set(test_i, test_p, 7, gene_order, -1), c(0, 1, 2, 3, 4, 5, 6))
 	expect_equal(get_cell_set(test_i, test_p, 7, gene_order, 5), c(6))
+	expect_equal(get_cell_set(test_i, test_p, 7, gene_order, 0), c(2, 3, 4, 5, 6))
 })
 
 test_that("genes that have no overlaps are selected correctly", {
@@ -54,6 +56,6 @@ test_that("whole algoritm works okay", {
 
 	# finally, test whole algoritm
 	outlist_2 <- content_clust(test_i, test_p, 7, gene_names, gene_order)
-	expected_outlist_2 <- list("a"=outlist, "b"=c(0, 1))
+	expected_outlist_2 <- list("a"=expected_outlist, "b"=c(0, 1))
 	expect_equal(outlist_2, expected_outlist_2)
 })
