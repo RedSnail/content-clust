@@ -1,0 +1,6 @@
+language: r
+
+r:
+ - 3.6.1
+
+warnings_are_errors: false
