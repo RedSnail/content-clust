@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// concat
+Rcpp::String concat(Rcpp::CharacterVector vec, Rcpp::String separator);
+RcppExport SEXP _content_clust_concat(SEXP vecSEXP, SEXP separatorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type vec(vecSEXP);
+    Rcpp::traits::input_parameter< Rcpp::String >::type separator(separatorSEXP);
+    rcpp_result_gen = Rcpp::wrap(concat(vec, separator));
+    return rcpp_result_gen;
+END_RCPP
+}
 // expression
 NumericVector expression(NumericVector p);
 RcppExport SEXP _content_clust_expression(SEXP pSEXP) {
@@ -47,34 +59,34 @@ BEGIN_RCPP
 END_RCPP
 }
 // substract_sorted
-IntegerVector substract_sorted(IntegerVector a, IntegerVector i, int b_start, int b_end);
-RcppExport SEXP _content_clust_substract_sorted(SEXP aSEXP, SEXP iSEXP, SEXP b_startSEXP, SEXP b_endSEXP) {
+IntegerVector substract_sorted(IntegerVector a, IntegerVector i, IntegerVector b_starts, IntegerVector b_ends);
+RcppExport SEXP _content_clust_substract_sorted(SEXP aSEXP, SEXP iSEXP, SEXP b_startsSEXP, SEXP b_endsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerVector >::type a(aSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
-    Rcpp::traits::input_parameter< int >::type b_start(b_startSEXP);
-    Rcpp::traits::input_parameter< int >::type b_end(b_endSEXP);
-    rcpp_result_gen = Rcpp::wrap(substract_sorted(a, i, b_start, b_end));
+    Rcpp::traits::input_parameter< IntegerVector >::type b_starts(b_startsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type b_ends(b_endsSEXP);
+    rcpp_result_gen = Rcpp::wrap(substract_sorted(a, i, b_starts, b_ends));
     return rcpp_result_gen;
 END_RCPP
 }
 // find_children
-IntegerVector find_children(IntegerVector content, int parent);
-RcppExport SEXP _content_clust_find_children(SEXP contentSEXP, SEXP parentSEXP) {
+IntegerVector find_children(IntegerVector content, IntegerVector parents);
+RcppExport SEXP _content_clust_find_children(SEXP contentSEXP, SEXP parentsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerVector >::type content(contentSEXP);
-    Rcpp::traits::input_parameter< int >::type parent(parentSEXP);
-    rcpp_result_gen = Rcpp::wrap(find_children(content, parent));
+    Rcpp::traits::input_parameter< IntegerVector >::type parents(parentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(find_children(content, parents));
     return rcpp_result_gen;
 END_RCPP
 }
 // get_cell_set
-IntegerVector get_cell_set(IntegerVector i, IntegerVector p, int cells, IntegerVector geneOrder, int start);
-RcppExport SEXP _content_clust_get_cell_set(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneOrderSEXP, SEXP startSEXP) {
+IntegerVector get_cell_set(IntegerVector i, IntegerVector p, int cells, IntegerVector geneOrder, IntegerVector starts);
+RcppExport SEXP _content_clust_get_cell_set(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneOrderSEXP, SEXP startsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -82,13 +94,25 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< int >::type cells(cellsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type geneOrder(geneOrderSEXP);
-    Rcpp::traits::input_parameter< int >::type start(startSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_cell_set(i, p, cells, geneOrder, start));
+    Rcpp::traits::input_parameter< IntegerVector >::type starts(startsSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_cell_set(i, p, cells, geneOrder, starts));
+    return rcpp_result_gen;
+END_RCPP
+}
+// is_in
+bool is_in(int x, IntegerVector a);
+RcppExport SEXP _content_clust_is_in(SEXP xSEXP, SEXP aSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type x(xSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type a(aSEXP);
+    rcpp_result_gen = Rcpp::wrap(is_in(x, a));
     return rcpp_result_gen;
 END_RCPP
 }
 // get_sep_genes
-IntegerVector get_sep_genes(IntegerVector i, IntegerVector p, IntegerVector geneOrder, IntegerVector child_genes);
+Rcpp::List get_sep_genes(IntegerVector i, IntegerVector p, IntegerVector geneOrder, IntegerVector child_genes);
 RcppExport SEXP _content_clust_get_sep_genes(SEXP iSEXP, SEXP pSEXP, SEXP geneOrderSEXP, SEXP child_genesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -102,8 +126,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // process_oriented_graph
-Rcpp::List process_oriented_graph(IntegerVector i, IntegerVector p, int cells, CharacterVector geneNames, IntegerVector geneOrder, IntegerVector content, int start);
-RcppExport SEXP _content_clust_process_oriented_graph(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneNamesSEXP, SEXP geneOrderSEXP, SEXP contentSEXP, SEXP startSEXP) {
+Rcpp::List process_oriented_graph(IntegerVector i, IntegerVector p, int cells, CharacterVector geneNames, IntegerVector geneOrder, IntegerVector content, IntegerVector starts);
+RcppExport SEXP _content_clust_process_oriented_graph(SEXP iSEXP, SEXP pSEXP, SEXP cellsSEXP, SEXP geneNamesSEXP, SEXP geneOrderSEXP, SEXP contentSEXP, SEXP startsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -113,8 +137,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< CharacterVector >::type geneNames(geneNamesSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type geneOrder(geneOrderSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type content(contentSEXP);
-    Rcpp::traits::input_parameter< int >::type start(startSEXP);
-    rcpp_result_gen = Rcpp::wrap(process_oriented_graph(i, p, cells, geneNames, geneOrder, content, start));
+    Rcpp::traits::input_parameter< IntegerVector >::type starts(startsSEXP);
+    rcpp_result_gen = Rcpp::wrap(process_oriented_graph(i, p, cells, geneNames, geneOrder, content, starts));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -133,27 +157,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// c_hello_world
-void c_hello_world();
-RcppExport SEXP _content_clust_c_hello_world() {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    c_hello_world();
-    return R_NilValue;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_content_clust_concat", (DL_FUNC) &_content_clust_concat, 2},
     {"_content_clust_expression", (DL_FUNC) &_content_clust_expression, 1},
     {"_content_clust_small_in_big", (DL_FUNC) &_content_clust_small_in_big, 5},
     {"_content_clust_have_overlap", (DL_FUNC) &_content_clust_have_overlap, 5},
     {"_content_clust_substract_sorted", (DL_FUNC) &_content_clust_substract_sorted, 4},
     {"_content_clust_find_children", (DL_FUNC) &_content_clust_find_children, 2},
     {"_content_clust_get_cell_set", (DL_FUNC) &_content_clust_get_cell_set, 5},
+    {"_content_clust_is_in", (DL_FUNC) &_content_clust_is_in, 2},
     {"_content_clust_get_sep_genes", (DL_FUNC) &_content_clust_get_sep_genes, 4},
     {"_content_clust_process_oriented_graph", (DL_FUNC) &_content_clust_process_oriented_graph, 7},
     {"_content_clust_content_clust", (DL_FUNC) &_content_clust_content_clust, 5},
-    {"_content_clust_c_hello_world", (DL_FUNC) &_content_clust_c_hello_world, 0},
     {NULL, NULL, 0}
 };
 
