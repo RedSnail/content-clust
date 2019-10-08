@@ -112,7 +112,7 @@ IntegerVector substract_sorted(IntegerVector a, IntegerVector i, IntegerVector b
 	      }
 	    }
 	  }
-	  while (a[a_index] <= min_val) {
+	  while ((a[a_index] <= min_val) && (a_index < a.length())) {
 	    if (a[a_index] != min_val) {
 	      result.push_back(a[a_index]);
 	    }
@@ -240,7 +240,8 @@ Rcpp::List process_oriented_graph(IntegerVector i, IntegerVector p, int cells,
 		Rcpp::List child_sublist = process_oriented_graph(i, p, cells, geneNames, geneOrder, content, components[sep_ind]);
 	  IntegerVector component = components[sep_ind];
 	  IntegerVector real_inds = geneOrder[component];
-		Rcpp::String gene_name = concat(geneNames[real_inds], " ");
+	  CharacterVector names = geneNames[real_inds];
+		Rcpp::String gene_name = concat(names.sort(), " ");
 		list_names.push_back(gene_name);
 		if (child_sublist.length() > 1) {
 			outlist.push_back(child_sublist);  

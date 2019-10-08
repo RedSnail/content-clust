@@ -64,7 +64,7 @@ test_that("genes that have no overlaps are selected correctly", {
 })
 
 test_that("whole algoritm works okay", {
-	gene_names <- c("a", "a.a", "shit1", "shit2", "a.a.a", "b")
+	gene_names <- c("a", "a.a", "shit2", "shit1", "a.a.a", "b")
 	# test subgraph processing
 	outlist <- process_oriented_graph(test_i, test_p, 7, gene_names, gene_order, c(-1, 0, 0, 0, -1, 1), c(0))
 	expected_outlist <-list("a.a" = list("a.a.a" = c(6), "unclassified" = c(5)), "shit1 shit2" = c(2, 3, 4))
