@@ -232,21 +232,20 @@ Rcpp::List process_oriented_graph(IntegerVector i, IntegerVector p, int cells,
 	IntegerVector unclassified = get_cell_set(i, p, cells, geneOrder, starts);
 
 	Rcpp::List components = get_sep_genes(i, p, geneOrder, child_vertices);
-	
 	Rcpp::List outlist;
 	Rcpp::StringVector list_names;
 
 	for (int sep_ind = 0; sep_ind < components.length(); sep_ind++) {
+		IntegerVector component = components[sep_ind];
 		Rcpp::List child_sublist = process_oriented_graph(i, p, cells, geneNames, geneOrder, content, components[sep_ind]);
-	  IntegerVector component = components[sep_ind];
-	  IntegerVector real_inds = geneOrder[component];
-	  CharacterVector names = geneNames[real_inds];
-		Rcpp::String gene_name = concat(names.sort(), " ");
+		IntegerVector real_inds = geneOrder[component];
+		CharacterVector names = geneNames[real_inds];
+		Rcpp::String gene_name = concat(names.sort(), ",");
 		list_names.push_back(gene_name);
-		if (child_sublist.length() > 1) {
-			outlist.push_back(child_sublist);  
-		} else {
+		if (child_sublist.length() == 1) {
 			outlist.push_back(child_sublist[0]);
+		} else {
+			outlist.push_back(child_sublist);
 		}
 
 		IntegerVector start_ind = geneOrder[component];
@@ -263,7 +262,19 @@ Rcpp::List process_oriented_graph(IntegerVector i, IntegerVector p, int cells,
 	}
   
 	outlist.names() = list_names;
-	return outlist;
+	
+	Rcpp::List ret;
+	
+	if ((outlist.length() == 1) && (list_names[0] != "unclassified")) {
+		ret = outlist[0];
+		printf("single cluster list namedd %s\n", list_names[0]);
+	
+	} else {
+		ret = outlist;
+	}
+	
+	return ret;
+	
 }
 
 //' @export
