@@ -67,17 +67,17 @@ test_that("whole algoritm works okay", {
 	gene_names <- c("a", "a.a", "shit2", "shit1", "a.a.a", "b")
 	# test subgraph processing
 	outlist <- process_oriented_graph(test_i, test_p, 7, gene_names, gene_order, c(-1, 0, 0, 0, -1, 1), c(0))
-	expected_outlist <-list("a.a" = list("a.a.a" = c(6), "unclassified" = c(5)), "shit1 shit2" = c(2, 3, 4))
+	expected_outlist <-list("a.a" = list("a.a.a" = c(6), "unclassified" = c(5)), "shit1,shit2" = c(2, 3, 4))
 	expect_equal(outlist, expected_outlist)
 	whole_p <- c(0, 3, 5, 7, 9, 10, 12)
-  whole_i <- c(2, 3, 4, 4, 5, 6, 7, 7, 8, 7, 0, 1)
-  whole_order <- order(expression(whole_p), decreasing = TRUE) - 1
+	whole_i <- c(2, 3, 4, 4, 5, 6, 7, 7, 8, 7, 0, 1)
+	whole_order <- order(expression(whole_p), decreasing = TRUE) - 1
 
-  whole_names <- c("a.1", "a.2", "b.1", "b.2", "b.a.1", "c.1")
+	whole_names <- c("a.1", "a.2", "b.1", "b.2", "b.a.1", "c.1")
 
 
 	# finally, test whole algoritm
 	outlist_2 <- content_clust(whole_i, whole_p, 9, whole_names, whole_order)
-	expected_outlist_2 <- list("a.1 a.2" = c(2, 3, 4, 5), "b.1 b.2" = list("b.a.1"=c(7), "unclassified"=c(6, 8)), "c.1" = c(0, 1))
+	expected_outlist_2 <- list("a.1,a.2" = c(2, 3, 4, 5), "b.1,b.2" = list("b.a.1"=c(7), "unclassified"=c(6, 8)), "c.1" = c(0, 1))
 	expect_equal(outlist_2, expected_outlist_2)
 })
